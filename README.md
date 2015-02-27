@@ -47,4 +47,4 @@ A header containing the length of the content, and the length of the RLE compres
 Finally, every byte's bit code is looked up, and written to the output.
 
 ### Results
-This README.md file is reduced by ~20% when compressed.
+This README.md file is reduced by about 20% when compressed.
