@@ -187,19 +187,17 @@ size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t le
 	
 	diffEncode(diffEncodedList, sortedList, 256);
 	
-	// Maybe there is an instance where the size could be over 255 giving an overflow?
-	// If this crashes on a certain file, this is probably why :P
-	unsigned char diffEncodedListRLESize = rleBytesOf1Encode(NULL, diffEncodedList, 256);
+	unsigned short diffEncodedListRLESize = rleBytesOf1Encode(NULL, diffEncodedList, 256);
 	unsigned char *diffEncodedListRLE = malloc(diffEncodedListRLESize);
 	rleBytesOf1Encode(diffEncodedListRLE, diffEncodedList, 256);
 	
 	if(write) {
 		memcpy(destination, &length, 4);
-		memcpy(destination + 4, &diffEncodedListRLESize, 1);
-		memcpy(destination + 5, diffEncodedListRLE, diffEncodedListRLESize);
+		memcpy(destination + 4, &diffEncodedListRLESize, 2);
+		memcpy(destination + 6, diffEncodedListRLE, diffEncodedListRLESize);
 	}
 	
-	destination += 5 + diffEncodedListRLESize;
+	destination += 6 + diffEncodedListRLESize;
 	unsigned char *byteOffset = destination;
 	unsigned char bitOffset = 0;
 	
@@ -210,7 +208,7 @@ size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t le
 	
 	free(diffEncodedListRLE);
 	
-	return 5 + diffEncodedListRLESize + (byteOffset - destination) + (bitOffset != 0);
+	return 6 + diffEncodedListRLESize + (byteOffset - destination) + (bitOffset != 0);
 }
 
 size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t length) {
@@ -219,11 +217,12 @@ size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t 
 	
 	if(!destination) return contentLength;
 	
-	unsigned char tableLength = source[4];
+	unsigned short tableLength;
+	memcpy(&tableLength, source + 4, 2);
 	
 	unsigned char *diffEncodedListRLE;
 	diffEncodedListRLE = malloc(tableLength);
-	memcpy(diffEncodedListRLE, source + 5, tableLength);
+	memcpy(diffEncodedListRLE, source + 6, tableLength);
 	
 	unsigned char diffEncodedList[256];
 	rleBytesOf1Decode(diffEncodedList, diffEncodedListRLE, tableLength); // max size
@@ -233,7 +232,7 @@ size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t 
 	unsigned char sortedList[256];
 	diffDecode(sortedList, diffEncodedList, 256);
 	
-	unsigned char *byteOffset = source + 5 + tableLength;
+	unsigned char *byteOffset = source + 6 + tableLength;
 	unsigned char bitOffset = 0;
 	
 	int j = 0;
