@@ -1,2 +1,8 @@
+.PHONY: clean
+
 ctc: ctc.c main.c
-	gcc ctc.c main.c -o $@ -Wall -O2
+	gcc $^ -o $@ -Wall -O2
+
+clean:
+	@rm -f ctc
+	@rm -f ctc.exe
