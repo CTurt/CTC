@@ -31,9 +31,6 @@ Each character is assigned a bit code, which is shorter if the character is more
     111100    |  8
     111101    |  9
     1111100   |  10
-    1111101   |  11
-    11111100  |  12
-    11111101  |  13
     ...
 
 For example, if the most frequently used character is e, then it will be assigned the bit code 00.
@@ -47,4 +44,6 @@ A header containing the length of the content, and the length of the RLE compres
 Finally, every byte's bit code is looked up, and written to the output.
 
 ### Results
-This README.md file is reduced by about 20% when compressed.
+This README.md file is reduced by about 20 percent when compressed.
+
+A 100 by 100 blank bitmap is reduced by about 70 percent when compressed, and will reduce even more if compressed again.
