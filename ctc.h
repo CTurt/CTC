@@ -2,7 +2,7 @@
 
 struct ctcHeader {
 	size_t contentLength;
-	unsigned char tableLength;
+	unsigned short tableLength;
 };
 
 // You can pass NULL as the destination of any compression / decompression function to get the size of the data after compression / decompression.
