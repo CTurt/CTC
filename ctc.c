@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "ctc.h"
@@ -192,12 +193,12 @@ size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t le
 	rleBytesOf1Encode(diffEncodedListRLE, diffEncodedList, 256);
 	
 	if(write) {
-		memcpy(destination, &length, 4);
-		memcpy(destination + 4, &diffEncodedListRLESize, 2);
-		memcpy(destination + 6, diffEncodedListRLE, diffEncodedListRLESize);
+		memcpy(destination + offsetof(struct ctcHeader, contentLength), &length, 4);
+		memcpy(destination + offsetof(struct ctcHeader, tableLength), &diffEncodedListRLESize, 2);
+		memcpy(destination + offsetof(struct ctcHeader, tableLength) + 2, diffEncodedListRLE, diffEncodedListRLESize);
 	}
 	
-	destination += 6 + diffEncodedListRLESize;
+	destination += offsetof(struct ctcHeader, tableLength) + 2 + diffEncodedListRLESize;
 	unsigned char *byteOffset = destination;
 	unsigned char bitOffset = 0;
 	
@@ -208,21 +209,21 @@ size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t le
 	
 	free(diffEncodedListRLE);
 	
-	return 6 + diffEncodedListRLESize + (byteOffset - destination) + (bitOffset != 0);
+	return offsetof(struct ctcHeader, tableLength) + 2 + diffEncodedListRLESize + (byteOffset - destination) + (bitOffset != 0);
 }
 
 size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t length) {
 	size_t contentLength;
-	memcpy(&contentLength, source, 4);
+	memcpy(&contentLength, source + offsetof(struct ctcHeader, contentLength), 4);
 	
 	if(!destination) return contentLength;
 	
 	unsigned short tableLength;
-	memcpy(&tableLength, source + 4, 2);
+	memcpy(&tableLength, source + offsetof(struct ctcHeader, tableLength), 2);
 	
 	unsigned char *diffEncodedListRLE;
 	diffEncodedListRLE = malloc(tableLength);
-	memcpy(diffEncodedListRLE, source + 6, tableLength);
+	memcpy(diffEncodedListRLE, source + offsetof(struct ctcHeader, tableLength) + 2, tableLength);
 	
 	unsigned char diffEncodedList[256];
 	rleBytesOf1Decode(diffEncodedList, diffEncodedListRLE, tableLength); // max size
@@ -232,7 +233,7 @@ size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t 
 	unsigned char sortedList[256];
 	diffDecode(sortedList, diffEncodedList, 256);
 	
-	unsigned char *byteOffset = source + 6 + tableLength;
+	unsigned char *byteOffset = source + offsetof(struct ctcHeader, tableLength) + 2 + tableLength;
 	unsigned char bitOffset = 0;
 	
 	int j = 0;
