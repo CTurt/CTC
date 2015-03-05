@@ -21,7 +21,5 @@ void sortFrequencies(unsigned char *sortedListDestination, unsigned char *freque
 // Gets a list of how frequent each character is
 void getFrequencies(unsigned char *frequencyTable, unsigned char *data, size_t length);
 
-// Memset 0 over destination before using!
 size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t length);
-
 size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t length);

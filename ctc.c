@@ -175,7 +175,6 @@ static unsigned char getSortedListIndex(unsigned char *sortedList, unsigned char
 	return 0;
 }
 
-// Memset 0 over destination before using!
 size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t length) {
 	unsigned char write = destination != NULL;
 	
@@ -205,6 +204,14 @@ size_t CTC_Compress(unsigned char *destination, unsigned char *source, size_t le
 	int i;
 	for(i = 0; i < length; i++) {
 		writeBitCode(write, &byteOffset, &bitOffset, getSortedListIndex(sortedList, source[i]));
+	}
+	
+	// Finish writing last byte
+	if(bitOffset != 0) {
+		while(bitOffset < 8) {
+			writeBit(byteOffset, bitOffset, 0);
+			bitOffset++;
+		}
 	}
 	
 	free(diffEncodedListRLE);

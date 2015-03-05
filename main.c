@@ -121,9 +121,6 @@ int main(int argc, char **argv) {
 		
 		outputData = malloc(outputSize);
 		
-		// Required!
-		memset(outputData, '\0', outputSize);
-		
 		CTC_Compress(outputData, inputData, inputSize);
 		
 		f = fopen(output, "wb");
