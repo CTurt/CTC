@@ -35,17 +35,17 @@ size_t rleBytesOf1Encode(unsigned char *destination, unsigned char *source, size
 	return j;
 }
 
-size_t rleBytesOf1Decode(unsigned char *destination, unsigned char *source, size_t length) {
+size_t rleBytesOf1Decode(unsigned char *destination, unsigned char *source, size_t sourceLength, size_t maxDestinationLength) {
 	unsigned int i, j = 0, c;
 	
-	for(i = 0; i < length; i++) {
-		if(destination) destination[j] = source[i];
+	for(i = 0; i < sourceLength; i++) {
+		if(destination && j < maxDestinationLength) destination[j] = source[i];
 		j++;
 		
 		if(source[i] == 1) {
-			if(i + 1 < length) {
+			if(i + 1 < sourceLength) {
 				for(c = 0; c < source[i + 1]; c++) {
-					if(destination) destination[j] = 1;
+					if(destination && j < maxDestinationLength) destination[j] = 1;
 					j++;
 				}
 				i++;
@@ -233,7 +233,13 @@ size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t 
 	memcpy(diffEncodedListRLE, source + offsetof(struct ctcHeader, tableLength) + 2, tableLength);
 	
 	unsigned char diffEncodedList[256];
-	rleBytesOf1Decode(diffEncodedList, diffEncodedListRLE, tableLength); // max size
+	if(rleBytesOf1Decode(NULL, diffEncodedListRLE, tableLength, 256) != 256) {
+		printf("Error! RLE table does not decompress to 256 bytes!\n");
+		free(diffEncodedListRLE);
+		return 0;
+	}
+	
+	rleBytesOf1Decode(diffEncodedList, diffEncodedListRLE, tableLength, 256);
 	
 	free(diffEncodedListRLE);
 	

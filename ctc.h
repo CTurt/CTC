@@ -9,7 +9,7 @@ struct ctcHeader {
 
 // Groups together consecutive bytes of 1
 size_t rleBytesOf1Encode(unsigned char *destination, unsigned char *source, size_t length);
-size_t rleBytesOf1Decode(unsigned char *destination, unsigned char *source, size_t length);
+size_t rleBytesOf1Decode(unsigned char *destination, unsigned char *source, size_t sourceLength, size_t maxDestinationLength);
 
 // Makes each byte relative to the previous, giving better RLE compression on the table
 void diffEncode(unsigned char *destination, unsigned char *source, size_t length);
