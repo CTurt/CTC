@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -250,11 +251,19 @@ size_t CTC_Decompress(unsigned char *destination, unsigned char *source, size_t 
 	unsigned char bitOffset = 0;
 	
 	int j = 0;
-	while(j < contentLength) {
+	while(byteOffset - source < length && j < contentLength) {
 		unsigned char n = readBitCode(&byteOffset, &bitOffset);
 		
 		destination[j] = sortedList[n];
 		j++;
+	}
+	
+	if(byteOffset - source < length) {
+		printf("Warning! Didn't decompress all data.\n");
+	}
+	
+	if(j < contentLength) {
+		printf("Warning! Didn't fill decompression buffer.\n");
 	}
 	
 	return j;
