@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 		}
 		
 		else if(strcmp(argv[i], "-o") == 0) {
-			if(i + 1 > argc) {
+			if(i + 1 >= argc) {
 				printf("Error! No filename after -o!\n");
 				return 1;
 			}
